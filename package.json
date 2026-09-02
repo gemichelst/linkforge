@@ -3,7 +3,6 @@
   "version": "0.3.0",
   "private": true,
   "scripts": {
-    "install": "npm install --legacy-peer-deps",
     "generate": "prisma generate",
     "migrate": "prisma migrate dev --name init",
     "dev": "next dev",
@@ -28,6 +27,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.3.7",
     "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^20",
     "@types/react": "^19",

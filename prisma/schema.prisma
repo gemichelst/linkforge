@@ -1,0 +1,149 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum LinkType {
+  LINK
+  EMAIL
+  PHONE
+  VIDEO
+  MUSIC
+  BOOKING
+  SHOP
+}
+
+enum ThemePreset {
+  MINIMAL
+  GLASS
+  NEON
+  EDITORIAL
+  BENTO
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+model User {
+  id                  String               @id @default(cuid())
+  name                String?
+  email               String               @unique
+  emailVerified       DateTime?
+  image               String?
+  passwordHash        String?
+  role                UserRole             @default(USER)
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  accounts            Account[]
+  sessions            Session[]
+  pages               Page[]
+  passwordResetTokens PasswordResetToken[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Page {
+  id              String      @id @default(cuid())
+  userId          String
+  title           String
+  slug            String      @unique
+  bio             String?
+  avatarUrl       String?
+  logoUrl         String?
+  backgroundType  String      @default("gradient")
+  backgroundValue String?
+  foregroundMedia String?
+  customCss       String?     @db.Text
+  seoTitle        String?
+  seoDescription  String?
+  themePreset     ThemePreset @default(MINIMAL)
+  isPublished     Boolean     @default(false)
+  publishedAt     DateTime?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  links           Link[]
+  clickEvents     ClickEvent[]
+}
+
+model Link {
+  id          String       @id @default(cuid())
+  pageId      String
+  label       String
+  url         String
+  icon        String?
+  sortOrder   Int          @default(0)
+  isFeatured  Boolean      @default(false)
+  linkType    LinkType     @default(LINK)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  page        Page         @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  clickEvents ClickEvent[]
+
+  @@index([pageId, sortOrder])
+}
+
+model ClickEvent {
+  id          String   @id @default(cuid())
+  pageId      String
+  linkId      String?
+  referrer    String?
+  userAgent   String?
+  countryCode String?
+  createdAt   DateTime @default(now())
+  page        Page     @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  link        Link?    @relation(fields: [linkId], references: [id], onDelete: SetNull)
+
+  @@index([pageId, createdAt])
+  @@index([linkId, createdAt])
+}

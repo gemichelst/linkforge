@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: dark;
+}
+
+html, body {
+  min-height: 100%;
+}
+
+body {
+  background:
+    radial-gradient(circle at top, rgba(34,211,238,0.16), transparent 34%),
+    radial-gradient(circle at bottom right, rgba(168,85,247,0.12), transparent 28%),
+    #020617;
+  color: #e5eef8;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  text-decoration: none;
+}
+
+input, textarea, select {
+  color: inherit;
+}
+
+::selection {
+  background: rgba(34, 211, 238, 0.35);
+}

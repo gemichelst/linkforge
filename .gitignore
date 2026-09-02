@@ -1,7 +1,11 @@
+.next
 node_modules/
 build/
 dist/
 coverage/
+public/uploads
+coverage
+npm-debug.log*
 .DS_Store
 *.log
 .env*

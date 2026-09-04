@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowRight, Sparkles } from 'lucide-react';
+
 import { Logo } from '@/components/ui/logo';
 
 export default function HomePage() {
@@ -16,11 +16,11 @@ export default function HomePage() {
 
         <section className="mt-8 grid gap-8 rounded-[2.5rem] border border-white/10 bg-white/5 p-8 backdrop-blur-xl lg:grid-cols-[1.2fr_0.8fr] lg:p-12">
           <div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/20 bg-cyan-400/10 px-3 py-1 text-sm text-cyan-200"><Sparkles className="h-4 w-4" /> Self-hosted link-in-bio builder</div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/20 bg-cyan-400/10 px-3 py-1 text-sm text-cyan-200"><span className="h-4 w-4">✨</span> Self-hosted link-in-bio builder</div>
             <h1 className="mt-6 max-w-3xl text-5xl font-semibold leading-tight tracking-tight">Build stylish, SSR-powered link pages with video, themes, uploads, and custom branding.</h1>
             <p className="mt-6 max-w-2xl text-base leading-7 text-slate-300">LinkForge is designed for creators, artists, DJs, labels, and developers who want more control than Linktree-style services offer.</p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
-              <Link href="/signup" className="inline-flex items-center gap-2 rounded-full bg-cyan-400 px-5 py-3 text-sm font-semibold text-slate-950">Create your account <ArrowRight className="h-4 w-4" /></Link>
+              <Link href="/signup" className="inline-flex items-center gap-2 rounded-full bg-cyan-400 px-5 py-3 text-sm font-semibold text-slate-950">Create your account <span className="h-4 w-4">→</span></Link>
               <Link href="/login" className="rounded-full border border-white/10 px-5 py-3 text-sm">Open dashboard</Link>
             </div>
           </div>

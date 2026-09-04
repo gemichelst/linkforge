@@ -4,6 +4,7 @@ import { PublicPage } from '@/components/public/public-page';
 
 export default async function PublicSlugPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
+  if (slug === '404' || slug === '500' || slug === '_not-found') return <div>Not found</div>;
   const page = await prisma.page.findUnique({ where: { slug }, include: { links: true } });
 
   if (!page || !page.isPublished) notFound();

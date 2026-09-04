@@ -8,7 +8,7 @@ function ResetPasswordForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
-  const token = params.get('token') ?? '';
+  const token = params?.get('token') ?? '';
 
   async function requestReset(event: React.FormEvent) {
     event.preventDefault();

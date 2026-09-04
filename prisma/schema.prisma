@@ -33,11 +33,13 @@ enum UserRole {
 model User {
   id                  String               @id @default(cuid())
   name                String?
+  username            String?              @unique
   email               String               @unique
   emailVerified       DateTime?
   image               String?
   passwordHash        String?
   role                UserRole             @default(USER)
+  forcePasswordChange Boolean              @default(false)
   createdAt           DateTime             @default(now())
   updatedAt           DateTime             @updatedAt
   accounts            Account[]

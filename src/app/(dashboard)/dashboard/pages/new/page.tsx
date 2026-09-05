@@ -23,7 +23,7 @@ export default function NewPage() {
           seoTitle: '',
           seoDescription: '',
           themePreset: 'MINIMAL',
-          links: [{ label: '', url: '', icon: '', linkType: 'LINK', isFeatured: false, sortOrder: 0 }],
+          links: [{ label: '', url: '', icon: '', linkType: 'LINK', isFeatured: false, startDate: null, endDate: null, sortOrder: 0 }],
         }}
       />
     </main>

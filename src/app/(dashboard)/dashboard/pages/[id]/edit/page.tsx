@@ -3,6 +3,8 @@ import { auth } from '@/auth';
 import { PageForm } from '@/components/dashboard/page-form';
 import { prisma } from '@/lib/prisma';
 
+const toLocal = (d: any) => d ? new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16) : null;
+
 export default async function EditPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
   if (!session?.user?.id) notFound();
@@ -27,7 +29,7 @@ export default async function EditPage({ params }: { params: Promise<{ id: strin
           <button className="rounded-full bg-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950">{page.isPublished ? 'Republish' : 'Publish now'}</button>
         </form>
       </div>
-      <PageForm endpoint={`/api/pages/${page.id}`} submitLabel="Save changes" initialValues={{ title: page.title, slug: page.slug, bio: page.bio ?? '', avatarUrl: page.avatarUrl ?? '', logoUrl: page.logoUrl ?? '', backgroundType: (page.backgroundType as 'gradient' | 'image' | 'video') ?? 'gradient', backgroundValue: page.backgroundValue ?? '', foregroundMedia: page.foregroundMedia ?? '', customCss: page.customCss ?? '', seoTitle: page.seoTitle ?? '', seoDescription: page.seoDescription ?? '', themePreset: page.themePreset as "MINIMAL" | "GLASS" | "NEON" | "EDITORIAL" | "BENTO", links: page.links.map((link: any) => ({ id: link.id, label: link.label, url: link.url, icon: link.icon ?? '', linkType: link.linkType, isFeatured: link.isFeatured, sortOrder: link.sortOrder })) }} />
+      <PageForm endpoint={`/api/pages/${page.id}`} submitLabel="Save changes" initialValues={{ title: page.title, slug: page.slug, bio: page.bio ?? '', avatarUrl: page.avatarUrl ?? '', logoUrl: page.logoUrl ?? '', backgroundType: (page.backgroundType as 'gradient' | 'image' | 'video') ?? 'gradient', backgroundValue: page.backgroundValue ?? '', foregroundMedia: page.foregroundMedia ?? '', customCss: page.customCss ?? '', seoTitle: page.seoTitle ?? '', seoDescription: page.seoDescription ?? '', themePreset: page.themePreset as "MINIMAL" | "GLASS" | "NEON" | "EDITORIAL" | "BENTO", links: page.links.map((link: any) => ({ id: link.id, label: link.label, url: link.url, icon: link.icon ?? '', linkType: link.linkType, isFeatured: link.isFeatured, startDate: toLocal(link.startDate), endDate: toLocal(link.endDate), sortOrder: link.sortOrder })) }} />
     </main>
   );
 }

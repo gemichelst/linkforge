@@ -8,8 +8,10 @@ export const linkSchema = z.object({
     return z.url().safeParse(value).success;
   }, 'Enter a valid URL, mailto:, or tel: value'),
   icon: z.string().max(40).optional().or(z.literal('')),
-  linkType: z.enum(['LINK', 'EMAIL', 'PHONE', 'VIDEO', 'MUSIC', 'BOOKING', 'SHOP']),
+  linkType: z.enum(['LINK', 'EMAIL', 'PHONE', 'VIDEO', 'MUSIC', 'BOOKING', 'SHOP', 'SOCIAL']),
   isFeatured: z.boolean().optional(),
+  startDate: z.string().optional().nullable(),
+  endDate: z.string().optional().nullable(),
   sortOrder: z.number().int().min(0),
 });
 

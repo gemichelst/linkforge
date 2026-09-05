@@ -42,6 +42,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
             icon: link.icon || null,
             linkType: link.linkType,
             isFeatured: link.isFeatured,
+            startDate: link.startDate ? new Date(link.startDate) : null,
+            endDate: link.endDate ? new Date(link.endDate) : null,
             sortOrder: index,
           })),
         },

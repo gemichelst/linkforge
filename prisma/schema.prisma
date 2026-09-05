@@ -92,6 +92,8 @@ model Link {
   sortOrder   Int          @default(0)
   isFeatured  Boolean      @default(false)
   linkType    String       @default("LINK")
+  startDate   DateTime?
+  endDate     DateTime?
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   page        Page         @relation(fields: [pageId], references: [id], onDelete: Cascade)

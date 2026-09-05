@@ -4,12 +4,14 @@ import { useMemo, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ExternalLink, GripVertical, Plus, Trash2, WandSparkles } from 'lucide-react';
+import { IconMap } from '@/lib/icons';
 import { UploadField } from '@/components/dashboard/upload-field';
 import { slugify } from '@/lib/utils';
 import { pageSchema, type PageInput } from '@/lib/validators';
+import { themePresets } from '@/lib/themes';
 
 const presets = ['MINIMAL', 'GLASS', 'NEON', 'EDITORIAL', 'BENTO'] as const;
-const linkTypes = ['LINK', 'EMAIL', 'PHONE', 'VIDEO', 'MUSIC', 'BOOKING', 'SHOP'] as const;
+const linkTypes = ['LINK', 'EMAIL', 'PHONE', 'VIDEO', 'MUSIC', 'BOOKING', 'SHOP', 'SOCIAL'] as const;
 
 export function PageForm({ initialValues, submitLabel, endpoint }: { initialValues: PageInput; submitLabel: string; endpoint: string }) {
   const [status, setStatus] = useState('');
@@ -37,20 +39,16 @@ export function PageForm({ initialValues, submitLabel, endpoint }: { initialValu
   const linkCount = watchLinks?.length ?? 0;
   const featuredCount = watchLinks?.filter((link) => link.isFeatured).length ?? 0;
 
-  const previewClasses = useMemo(() => {
-    switch (watchThemePreset) {
-      case 'GLASS':
-        return 'bg-white/10 backdrop-blur-xl border-white/20';
-      case 'NEON':
-        return 'bg-slate-950/90 border-cyan-400/40 shadow-[0_0_40px_rgba(34,211,238,0.18)]';
-      case 'EDITORIAL':
-        return 'bg-stone-100 text-stone-900 border-stone-300';
-      case 'BENTO':
-        return 'bg-slate-900/90 border-fuchsia-300/20';
-      default:
-        return 'bg-slate-950/70 border-white/10';
-    }
-  }, [watchThemePreset]);
+  const socialLinks = (watchLinks || []).filter(l => l.linkType === 'SOCIAL');
+  const regularLinks = (watchLinks || []).filter(l => l.linkType !== 'SOCIAL');
+
+  const preset = themePresets[watchThemePreset as keyof typeof themePresets] || themePresets.MINIMAL;
+
+  const DynamicIcon = ({ name }: { name: string }) => {
+    if (!name) return null;
+    const Icon = IconMap[name.toLowerCase()] || IconMap[name] || IconMap['Globe'];
+    return Icon ? <Icon className="h-5 w-5" /> : null;
+  };
 
   function normalizeLinks(values: PageInput) {
     return values.links.map((link, index) => ({ ...link, sortOrder: index, icon: link.icon ?? '' }));
@@ -181,6 +179,8 @@ export function PageForm({ initialValues, submitLabel, endpoint }: { initialValu
               <label className="grid gap-2 text-sm md:col-span-4"><span>URL</span><input className="rounded-xl border border-white/10 bg-slate-900 px-3 py-2" {...form.register(`links.${index}.url`)} /></label>
               <label className="grid gap-2 text-sm md:col-span-2"><span>Type</span><select className="rounded-xl border border-white/10 bg-slate-900 px-3 py-2" {...form.register(`links.${index}.linkType`)}>{linkTypes.map((type) => <option key={type} value={type}>{type}</option>)}</select></label>
               <label className="grid gap-2 text-sm md:col-span-2"><span>Icon name</span><input className="rounded-xl border border-white/10 bg-slate-900 px-3 py-2" {...form.register(`links.${index}.icon`)} placeholder="music2, instagram..." /></label>
+              <label className="grid gap-2 text-sm md:col-span-3"><span>Start Date</span><input type="datetime-local" className="rounded-xl border border-white/10 bg-slate-900 px-3 py-2" {...form.register(`links.${index}.startDate`)} /></label>
+              <label className="grid gap-2 text-sm md:col-span-3"><span>End Date</span><input type="datetime-local" className="rounded-xl border border-white/10 bg-slate-900 px-3 py-2" {...form.register(`links.${index}.endDate`)} /></label>
               <label className="md:col-span-2 flex items-center gap-2 text-sm"><input type="checkbox" className="h-4 w-4" {...form.register(`links.${index}.isFeatured`)} /> Featured</label>
               <div className="md:col-span-10 flex flex-wrap items-center gap-2">
                 <button type="button" className="rounded-full border border-white/10 px-3 py-1 text-xs" onClick={() => moveLink(index, -1)}>Move up</button>
@@ -207,17 +207,42 @@ export function PageForm({ initialValues, submitLabel, endpoint }: { initialValu
 
         <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
           <h2 className="text-lg font-semibold">Live preview</h2>
-          <div className={`mt-4 overflow-hidden rounded-[2rem] border p-5 ${previewClasses}`}>
-            <div className="mx-auto grid max-w-sm gap-4 text-center">
-              {watchAvatar ? <img src={watchAvatar} alt="Avatar preview" className="mx-auto h-20 w-20 rounded-full object-cover" /> : <div className="mx-auto h-20 w-20 rounded-full border border-white/10 bg-white/5" />}
-              {watchLogo ? <img src={watchLogo} alt="Logo preview" className="mx-auto h-10 object-contain" /> : null}
-              <div>
-                <h3 className="text-2xl font-semibold">{watchTitle || 'Page title'}</h3>
-                <p className="mt-2 text-sm opacity-80">{watchBio || 'Your bio preview will appear here.'}</p>
-              </div>
-              <div className="grid gap-3">
-                {(watchLinks || []).slice(0, 4).map((link, index) => <div key={`${link.label}-${index}`} className="rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-sm">{link.label || `Link ${index + 1}`}</div>)}
-                {!watchLinks?.length ? <div className="rounded-2xl border border-dashed border-white/10 px-4 py-6 text-sm opacity-70">Add links to preview the stack.</div> : null}
+          <div className="relative mt-4 overflow-hidden rounded-[2rem] border min-h-[500px]">
+            {watchBackgroundType === 'video' && watchBackgroundValue ? <video className="absolute inset-0 h-full w-full object-cover" src={watchBackgroundValue} autoPlay muted loop playsInline /> : null}
+            {watchBackgroundType === 'image' && watchBackgroundValue ? <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${watchBackgroundValue})` }} /> : null}
+            <div className="absolute inset-0 bg-slate-950/45" />
+            <div className={`relative h-full p-5 ${preset.shell}`}>
+              <div className="mx-auto grid max-w-sm gap-4 text-center">
+                {watchAvatar ? <img src={watchAvatar} alt="Avatar preview" className="mx-auto h-20 w-20 rounded-full object-cover" /> : <div className="mx-auto h-20 w-20 rounded-full border border-white/10 bg-white/5" />}
+                {watchLogo ? <img src={watchLogo} alt="Logo preview" className="mx-auto h-10 object-contain" /> : null}
+                <div>
+                  <h3 className="text-2xl font-semibold">{watchTitle || 'Page title'}</h3>
+                  <p className="mt-2 text-sm opacity-80">{watchBio || 'Your bio preview will appear here.'}</p>
+                </div>
+                
+                {socialLinks.length > 0 && (
+                  <div className="flex flex-wrap items-center justify-center gap-4">
+                    {socialLinks.map((link, index) => (
+                      <div key={`${link.label}-${index}`} className="rounded-full bg-white/10 p-3 text-white">
+                        {link.icon ? <DynamicIcon name={link.icon} /> : <span className="text-sm font-medium">{link.label[0]}</span>}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div className="grid gap-3">
+                  {regularLinks.map((link, index) => (
+                    <div key={`${link.label}-${index}`} className={`rounded-2xl border px-4 py-4 text-center text-sm font-medium ${link.isFeatured ? preset.chip : preset.button}`}>
+                      {link.icon && (
+                        <span className="inline-block mr-2 align-middle">
+                          <DynamicIcon name={link.icon} />
+                        </span>
+                      )}
+                      {link.label || `Link ${index + 1}`}
+                    </div>
+                  ))}
+                  {!watchLinks?.length ? <div className="rounded-2xl border border-dashed border-white/10 px-4 py-6 text-sm opacity-70">Add links to preview the stack.</div> : null}
+                </div>
               </div>
             </div>
           </div>

@@ -7,41 +7,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum LinkType {
-  LINK
-  EMAIL
-  PHONE
-  VIDEO
-  MUSIC
-  BOOKING
-  SHOP
-}
-
-enum ThemePreset {
-  MINIMAL
-  GLASS
-  NEON
-  EDITORIAL
-  BENTO
-}
-
-enum UserRole {
-  USER
-  ADMIN
-}
-
 model User {
-  id                  String               @id @default(cuid())
+  id                  String    @id @default(uuid())
   name                String?
-  username            String?              @unique
-  email               String               @unique
+  username            String?   @unique
+  email               String?   @unique
   emailVerified       DateTime?
   image               String?
   passwordHash        String?
-  role                UserRole             @default(USER)
-  forcePasswordChange Boolean              @default(false)
-  createdAt           DateTime             @default(now())
-  updatedAt           DateTime             @updatedAt
+  forcePasswordChange Boolean   @default(false)
+  role                String    @default("USER")
+  createdAt           DateTime  @default(now())
   accounts            Account[]
   sessions            Session[]
   pages               Page[]
@@ -49,7 +25,7 @@ model User {
 }
 
 model Account {
-  id                String  @id @default(cuid())
+  id                String  @id @default(uuid())
   userId            String
   type              String
   provider          String
@@ -61,13 +37,14 @@ model Account {
   scope             String?
   id_token          String? @db.Text
   session_state     String?
-  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
 
 model Session {
-  id           String   @id @default(cuid())
+  id           String   @id @default(uuid())
   sessionToken String   @unique
   userId       String
   expires      DateTime
@@ -82,70 +59,62 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-model PasswordResetToken {
-  id        String   @id @default(cuid())
-  userId    String
-  tokenHash String   @unique
-  expiresAt DateTime
-  usedAt    DateTime?
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-}
-
 model Page {
-  id              String      @id @default(cuid())
+  id              String       @id @default(uuid())
   userId          String
   title           String
-  slug            String      @unique
+  slug            String       @unique
   bio             String?
   avatarUrl       String?
   logoUrl         String?
-  backgroundType  String      @default("gradient")
+  backgroundType  String       @default("gradient")
   backgroundValue String?
   foregroundMedia String?
-  customCss       String?     @db.Text
+  customCss       String?
   seoTitle        String?
   seoDescription  String?
-  themePreset     ThemePreset @default(MINIMAL)
-  isPublished     Boolean     @default(false)
+  themePreset     String       @default("MINIMAL")
+  isPublished     Boolean      @default(false)
   publishedAt     DateTime?
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
-  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   links           Link[]
   clickEvents     ClickEvent[]
 }
 
 model Link {
-  id          String       @id @default(cuid())
+  id          String       @id @default(uuid())
   pageId      String
   label       String
   url         String
   icon        String?
   sortOrder   Int          @default(0)
   isFeatured  Boolean      @default(false)
-  linkType    LinkType     @default(LINK)
+  linkType    String       @default("LINK")
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   page        Page         @relation(fields: [pageId], references: [id], onDelete: Cascade)
   clickEvents ClickEvent[]
-
-  @@index([pageId, sortOrder])
 }
 
 model ClickEvent {
-  id          String   @id @default(cuid())
-  pageId      String
-  linkId      String?
-  referrer    String?
-  userAgent   String?
-  countryCode String?
-  createdAt   DateTime @default(now())
-  page        Page     @relation(fields: [pageId], references: [id], onDelete: Cascade)
-  link        Link?    @relation(fields: [linkId], references: [id], onDelete: SetNull)
+  id         String   @id @default(uuid())
+  pageId     String
+  linkId     String?
+  referrer   String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+  page       Page     @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  link       Link?    @relation(fields: [linkId], references: [id], onDelete: SetNull)
+}
 
-  @@index([pageId, createdAt])
-  @@index([linkId, createdAt])
+model PasswordResetToken {
+  id        String    @id @default(uuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

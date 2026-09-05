@@ -1,6 +1,6 @@
 'use client';
 
-import type { Link as LinkModel, Page } from '@prisma/client';
+type Page = any; type LinkModel = any;
 import { themePresets } from '@/lib/themes';
 
 type PublicPageProps = {
@@ -18,7 +18,7 @@ export function PublicPage({ page }: PublicPageProps) {
     } catch {}
   }
 
-  const preset = themePresets[page.themePreset];
+  const preset = themePresets[page.themePreset as keyof typeof themePresets] || themePresets.MINIMAL;
   const hasVideoBackground = page.backgroundType === 'video' && page.backgroundValue;
   const hasImageBackground = page.backgroundType === 'image' && page.backgroundValue;
 
@@ -36,7 +36,7 @@ export function PublicPage({ page }: PublicPageProps) {
           {page.bio ? <p className="mt-3 text-sm opacity-80">{page.bio}</p> : null}
         </div>
         <div className="grid gap-3">
-          {page.links.sort((a, b) => a.sortOrder - b.sortOrder).map((link) => (
+          {page.links.sort((a: any, b: any) => a.sortOrder - b.sortOrder).map((link: any) => (
             <a key={link.id} href={link.url} target="_blank" rel="noreferrer" onClick={() => trackClick(link.id)} className={`rounded-2xl border px-4 py-4 text-center text-sm font-medium transition hover:translate-y-[-1px] ${link.isFeatured ? preset.chip : preset.button}`}>
               {link.label}
             </a>

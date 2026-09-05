@@ -61,7 +61,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           email: user.email, 
           name: user.name, 
           image: user.image, 
-          role: user.role,
+          role: user.role as "USER" | "ADMIN",
           username: user.username,
           forcePasswordChange: user.forcePasswordChange
         };

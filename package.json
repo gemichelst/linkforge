@@ -6,7 +6,7 @@
     "generate": "prisma generate",
     "migrate": "prisma migrate dev --name init",
     "dev": "next dev -p 3000",
-    "build": "prisma generate && next build",
+    "build": "prisma generate && NODE_ENV=production next build",
     "nextbuild": "next build",
     "start": "next start -p 3000",
     "lint": "eslint ."

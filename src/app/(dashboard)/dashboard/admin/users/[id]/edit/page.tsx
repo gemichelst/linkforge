@@ -25,7 +25,7 @@ export default async function AdminEditUserPage({ params }: { params: Promise<{ 
         </header>
 
         <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6">
-          <AdminUserForm user={user} />
+          <AdminUserForm user={{ ...user, email: user.email || '' }} />
         </div>
       </div>
     </main>
